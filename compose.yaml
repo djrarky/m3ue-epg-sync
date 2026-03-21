@@ -1,0 +1,16 @@
+services:
+  m3ue-epg-sync:
+    image: ghcr.io/djrarky/m3ue-epg-sync:latest
+    restart: unless-stopped
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./out:/app/out
+      - ./.cache:/app/.cache
+  sky_epg_grab:
+    image: ghcr.io/djrarky/sky_epg_grab:latest
+    ports: ["8855:8855"]
+    environment:
+      REGION: 7
+      EPG_DAYS: 7
+      REFRESH_HOURS: 48
+    restart: unless-stopped

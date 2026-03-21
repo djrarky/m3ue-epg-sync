@@ -1,0 +1,23 @@
+config.yaml
+
+# Cache and output directories
+.cache/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

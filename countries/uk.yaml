@@ -1,0 +1,222 @@
+# UK & Ireland broadcast rules
+#
+# Normalization, scoping, and grouping rules for UK/IE IPTV channels.
+# Loaded when `country: uk` is set in config.yaml.
+#
+# To add a new country, copy this file (e.g. us.yaml) and adjust.
+
+# ── Canonical substitutions ──────────────────────────────────────────────────
+# Regex substitutions applied during channel name normalization.
+# These bridge naming gaps between IPTV titles and guide display names that
+# fuzzy matching alone can't handle.
+
+canonical_subs:
+  # IPTV provider prefixes - "UK:", "NOW:", "PRIME:", "VIP:" etc.
+  # First strip WORD: prefix, then strip any remaining leading colons/spaces
+  - pattern: "^\\s*\\w*\\s*:\\s*"
+    replace: ""
+  - pattern: "^[\\s:]+"
+    replace: ""
+  # Normalize +1 spacing - ensure space before +1 for consistency
+  - pattern: "(\\w)\\+1\\b"
+    replace: "\\1 +1"
+ 
+  # BBC
+  - pattern: "\\bBBC\\s*1\\b"
+    replace: "BBC ONE"
+  - pattern: "\\bBBC\\s*2\\b"
+    replace: "BBC TWO"
+  - pattern: "\\bBBC\\s*3\\b"
+    replace: "BBC THREE"
+  - pattern: "\\bBBC\\s*4\\b"
+    replace: "BBC FOUR"
+  - pattern: "\\bBBC\\s+CBBC\\b"
+    replace: "CBBC"
+  - pattern: "\\s*/\\s*CBBC\\b"
+    replace: ""
+  - pattern: "\\s*/\\s*CBEEBIES\\b"
+    replace: "" # ITV numbering - IPTV uses "ITV 1" but source uses "ITV1"
+  - pattern: "\\bITV\\s+(\\d)"
+    replace: "ITV\\1"
+
+  # "U&" branding
+  - pattern: "\\bU\\s*&\\s*"
+    replace: "U AND "
+
+  # Channel 4
+  - pattern: "\\bCHANNEL\\s*4\\s+(?!\\+1)[A-Z][A-Z &]+?(\\s*\\+1)?$"
+    replace: "CHANNEL 4\\1"
+
+  # Channel 5
+  - pattern: "\\bCHANNEL\\s*5\\b"
+    replace: "5"
+  - pattern: "\\b5\\s*USA\\b"
+    replace: "5USA"
+
+  # Fuzzy-viable scores but margin-gated by sibling channels
+  - pattern: "\\bCRIME\\s+INVESTIGATION\\b"
+    replace: "CRIME+INVESTIGATION"
+  - pattern: "\\bSCIFI\\b"
+    replace: "SCI-FI"
+
+  # Sky Cinema
+  - pattern: "\\bSKY (PREMIERE|ADVENTURE|ROM[- ]?COMS|FAMILY|ACTION|GREATS|THRILLER|DRAMA|ANIMATION)\\b"
+    replace: "SKY CINEMA \\1"
+  - pattern: "\\bSKY CINEMA ([A-Z][A-Z -]+)/[A-Z][A-Z ]+"
+    replace: "SKY CINEMA \\1"
+
+  # Abbreviations
+  - pattern: "\\bPL\\b"
+    replace: "PREMIER LEAGUE"
+  - pattern: "\\bJR\\b"
+    replace: "JUNIOR"
+  - pattern: "^ID\\b"
+    replace: "INVESTIGATION DISCOVERY"
+  - pattern: "\\bSP(?:ORTS)?\\s*\\+"
+    replace: "SPORTS ARENA"
+  - pattern: "\\bNAT GEO\\b"
+    replace: "NATIONAL GEOGRAPHIC"
+  - pattern: "\\bNATIONAL GEO\\b"
+    replace: "NATIONAL GEOGRAPHIC"
+  - pattern: "\\bCOMEDY CENT(RAL)? (XTRA|EXTRA)\\s*\\+1\\b"
+    replace: "COMEDY CENTRAL EXTRA"
+  - pattern: "\\bNICK\\b(?!\\s*(JR|JUNIOR|ALVIN|TOONS))"
+    replace: "NICKELODEON"
+
+  # IPTV renames / rebrands
+  - pattern: "^(ALIBI|DAVE|DRAMA|EDEN|GOLD|YESTERDAY)\\b"
+    replace: "U AND \\1"
+  - pattern: "\\bSYFY\\b"
+    replace: "SKY SCI-FI"
+  - pattern: "\\bPICK TV\\b"
+    replace: "SKY MIX"
+  - pattern: "\\bGREAT TV CHANNEL\\b"
+    replace: "GREAT TV"
+  - pattern: "^HISTORY\\s*2\\b"
+    replace: "SKY HISTORY2"
+  - pattern: "^HISTORY(?=\\s+HEVC|\\s+HD|\\s+SD|\\s+4K|\\s+UHD|$)"
+    replace: "SKY HISTORY"
+  - pattern: "\\bGREAT MOVIES ACTION\\b"
+    replace: "GREAT ACTION"
+  - pattern: "\\bGREAT MOVIES\\b"
+    replace: "GREAT MYSTERY"
+  - pattern: "\\bGREAT CLASSIC\\b"
+    replace: "GREAT ROMANCE"
+  - pattern: "\\bSKY CINEMA SUPERHEROES\\b"
+    replace: "SKY CINEMA GREATS"
+  - pattern: "^WATCH\\b"
+    replace: "U AND W"
+
+  # Bare channel names - IPTV drops suffixes
+  - pattern: "^DISCOVERY(?=\\s+\\+1|\\s+HEVC|\\s+HD|\\s+SD|\\s+4K|\\s+UHD|$)"
+    replace: "DISCOVERY CHANNEL"
+  - pattern: "^BLOOMBERG(\\s+EU)?(?=\\s+HEVC|\\s+HD|\\s+SD|\\s+4K|\\s+UHD|$)"
+    replace: "BLOOMBERG TELEVISION"
+  - pattern: "\\bAL JAZEERA\\s+EN\\b"
+    replace: "AL JAZEERA ENGLISH"
+  - pattern: "^CNBC(?=\\s+HEVC|\\s+HD|\\s+SD|\\s+4K|\\s+UHD|$)"
+    replace: "CNBC EUROPE"
+
+# ── Region abbreviations ─────────────────────────────────────────────────────
+# Expanded during normalization so abbreviated IPTV region names can
+# fuzzy-match guide entries that use the full name.
+# e.g. "BBC ONE SCOT" → "BBC ONE SCOTLAND"
+
+region_abbrevs:
+  SCOTLAND:
+    - "SCOT"
+  YORKSHIRE:
+    - "YORKS"
+  NORTH_WEST:
+    - "GRANADA"
+    - "NW"
+  NORTH_EAST_CUMBRIA:
+    - "NE CUMBRIA"
+    - "NORTH EAST AND CUMBRIA"
+    - "NORTH EAST& CAM"
+    - "NORTH EAST &CAM"
+    - "NORTH EAST & CAM"
+  WEST_MIDLANDS:
+    - "WEST MIDS"
+    - "W MIDS"
+  EAST:
+    - "CAMBRIDGE"
+    - "EAST W"
+    - "OXFORD"
+  EAST_MIDLANDS:
+    - "EAST MIDS"
+    - "E MIDS"
+  SOUTH_WEST:
+    - "WESTCOUNTRY"
+    - "SW"
+  SOUTH_EAST:
+    - "SE"
+  YORKSHIRE_LINCOLNSHIRE:
+    - "YORKS LINCS"
+    - "E YORKS LINCS"
+    - "E YORKS & LINCS"
+    - "E YORKS AND LINCS"
+    - "E YORKSHIRE AND LINCS"
+    - "YK LI"
+    - "EAST YORKSHIRE AND LINCOLNSHIRE"
+    - "EAST YORKSHIRE & LINCOLNSHIRE"
+  CHANNEL_ISLANDS:
+    - "CI"
+    - "CHANNEL ISLAND"
+  NORTHERN_IRELAND:
+    - "NI"
+  BORDER_SCOTLAND:
+    - "BORDER"
+
+# ── Non-linear exclusions ────────────────────────────────────────────────────
+# Channels matching these patterns are excluded from matching scope.
+# Group patterns match against IPTV group names; title patterns match titles.
+
+non_linear_group_regex:
+  - "(^|\\|)\\s*24/7\\b"
+  - "\\bREPLAY\\b"
+
+non_linear_title_regex:
+  - "\\bSERIES\\s+(\\d+|INFO)\\b"
+  - "\\bSERIE\\s+(\\d+|INFO)\\b"
+  - "\\bDOCS\\s+(\\d+|INFO)\\b"
+  - "\\bPREMIERE\\s+(\\d+|INFO)\\b"
+  - "\\bRADIO\\b"
+  - "\\bEVENT\\s+\\d"
+
+# ── Country tokens ──────────────────────────────────────────────────────────
+# Tokens that identify country-level regions in excl. column annotations.
+# Used to distinguish country-level compound regions (e.g. "Eng & Scot" -
+# two countries sharing a feed) from sub-regional compounds
+# (e.g. "North East & Cumbria" - a single regional name).
+country_tokens:
+  - "eng"
+  - "scot"
+  - "scotstv"
+  - "scotitvb"
+  - "ni"
+  - "wales"
+  - "ci"
+  - "londonarea"
+  - "london"
+
+# ── Excl. suffix cleanup ───────────────────────────────────────────────────
+# Regex patterns to clean up excl. column annotations for display.
+# Applied to the title-cased region suffix before using as channel name.
+excl_suffix_cleanup:
+  - pattern: "[()]"
+    replace: ""
+  - pattern: "(Scot)(stv|itvb)"
+    replace: "\\1"
+  - pattern: "(London)(area)"
+    replace: "\\1"
+
+# ── Noise tokens ─────────────────────────────────────────────────────────────
+# Country-specific tokens stripped from channel names during normalization.
+# Added to the universal set (HD, SD, UHD, HEVC, 4K, etc.).
+noise_tokens:
+  - "UK"
+  - "IE"
+  - "FPS"
+  - "50"
+  - "ENGLAND"

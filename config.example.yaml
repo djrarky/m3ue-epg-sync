@@ -1,0 +1,80 @@
+# m3ue-epg-sync configuration reference
+# Copy to config.yaml and fill in the required values.
+
+# ── API connection ──────────────────────────────────────────────────────────────
+app:
+  base_url: "https://your-m3u-editor.example.com"   # m3u-editor instance URL (no trailing slash)
+  api_key: "SET_ME"                                 # Bearer token API key
+
+# ── Sync behaviour ───────────────────────────────────────────────────────────────
+sync:
+  dry_run: true          # Set to false to enable writes. Must be explicit.
+  max_retries: 3         # Retries on transient API errors
+  request_timeout_seconds: 20   # Timeout for m3u-editor API calls (scraping uses scraping_timeout_seconds)
+  # schedule: "6h"       # Run on interval (e.g. "30m", "6h", "1d"). Omit for single run.
+  # disable_other_groups: false  # Disable live groups not managed by m3ue-epg-sync
+  # max_consecutive_failures: 5  # Scheduled mode: abort after N consecutive failures
+
+# ── Playlists ───────────────────────────────────────────────────────────────────
+# uuid: "all" sets defaults for every playlist. Individual playlists inherit
+# from "all" and can override any key.
+#
+# All per-playlist keys are flat (no nesting). Country-specific defaults
+# (grouping rules, region preferences, non-linear patterns, etc.) come from
+# the country rules file (countries/<country>.yaml).
+playlists:
+  - uuid: "all"
+
+    # Country rules for channel name normalization and region matching.
+    # Loads countries/<country>.yaml (e.g. countries/uk.yaml, countries/us.yaml).
+    country: "uk"
+
+    # Provider module (sky, freeview, virgin, etc.)
+    provider: "sky"
+    provider_source: "viewersvault"
+
+    # TV region - locate here: https://viewersvault.com/Region_mapping_on_Sky_(United_Kingdom_and_Ireland)
+    # Auto-resolves BBC/ITV/Ch4 regional variants for guide matching.
+    # If you use sky_epg_grab for the guide, keep its REGION aligned with this.
+    region: 7
+
+    # EPG guide source - name (or UUID) of an EPG source configured in m3u-editor.
+    # Discovered via GET /user/epgs, downloaded from GET /epgs/{uuid}/epg.xml.
+    # For UK Sky, it is recommended that this points to a sky_epg_grab feed for the same region.
+    guide_epg_name: "SET_ME"
+
+    # Scraping API - pluggable backend for web scraping.
+    scraping_api: "olostep"          # or "scrapedo" - see scrapers/ for available backends
+    scraping_api_key: "SET_ME"
+    scraping_timeout_seconds: 60   # Scraping requests can be slow - separate from request_timeout_seconds
+    source_cache_days: 2
+    source_cache_dir: ".cache/scraper"  # Where scraper responses are cached on disk
+
+    # Channel scope - only process channels whose group name starts with these.
+    include_group_prefixes:
+      - "UK|"
+    exclude_group_regex: []
+
+    # Preserve rules - these channels/groups are never touched.
+    preserve_groups: []
+    preserve_group_name_regex: []
+    preserve_channel_title_regex: []
+
+    # Source validation - guard against badly rendered pages
+    min_channels: 100              # hard floor - reject if fewer channels parsed
+    max_drop_percent: 20           # reject if count drops more than this % vs previous cache
+
+    # Matching thresholds
+    min_auto_score: 90
+    min_auto_margin: 12
+    fuzzy_threshold: 90
+
+  # Real playlists - inherit from "all", override as needed.
+  - uuid: "SET_ME"
+
+  # Example: a second playlist with different settings.
+  # - uuid: "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
+  #   country: "us"
+  #   provider: "directv"
+  #   guide_epg_name: "US EPG"
+  #   include_group_prefixes: ["US|"]

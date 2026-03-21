@@ -1,0 +1,28 @@
+# Git and CI
+.git
+.gitignore
+.github
+
+# Runtime (mounted as volumes)
+.cache
+out
+config.yaml
+config.example.yaml
+
+# Python
+__pycache__
+*.pyc
+*.swp
+tests
+
+# Docs
+README.md
+LICENSE.md
+docs/
+
+# Build
+Dockerfile
+.dockerignore
+
+# Misc
+template.csv
