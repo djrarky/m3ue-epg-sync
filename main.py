@@ -53,6 +53,7 @@ _PLAYLIST_DEFAULTS = {
     "scraping_api_key": None,
     "region": None,
     "include_group_prefixes": [],
+    "include_managed_groups": True,
     "exclude_group_regex": [],
     "preserve_groups": [],
     "preserve_group_name_regex": [],
@@ -310,6 +311,15 @@ def _run_playlist(playlist_config: dict, app_config: dict, sync_config: dict, cl
     print(f"[{step}/{total_steps}] Fetching IPTV channels...", end="  ", flush=True)
 
     all_channels = client.fetch_channels(uuid)
+
+    # Auto-include groups managed by m3ue-epg-sync (derived from source categories)
+    if playlist_config.get("include_managed_groups", False) and _parse_bool(playlist_config["include_managed_groups"], "include_managed_groups"):
+        managed_names = sorted({e.category for e in source_entries})
+        existing = list(playlist_config.get("include_group_prefixes", []))
+        merged = list(dict.fromkeys(existing + managed_names))  # preserve order, dedupe
+        playlist_config = {**playlist_config, "include_group_prefixes": merged}
+        logger.info("include_managed_groups: added %d source categories to include_group_prefixes", len(managed_names))
+
     in_scope, excluded = apply_scope(all_channels, playlist_config, country_rules)
 
     print(f"{len(all_channels):,} fetched, {len(in_scope)} in scope, {len(excluded)} excluded")

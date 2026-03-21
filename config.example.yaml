@@ -51,6 +51,7 @@ playlists:
     source_cache_dir: ".cache/scraper"  # Where scraper responses are cached on disk
 
     # Channel scope - only process channels whose group name starts with these.
+    include_managed_groups: true    # auto-include groups created from source categories (default: true)
     include_group_prefixes:
       - "UK|"
     exclude_group_regex: []

@@ -87,6 +87,7 @@ services:
 | `sync.dry_run` | `true` (default) for reports only, `false` for writes |
 | `sync.schedule` | Repeat interval (e.g. `"6h"`, `"30m"`, `"1d"`). Omit for single run. |
 | `sync.disable_other_groups` | Disable live groups not managed by m3ue-epg-sync |
+| `playlists[].include_managed_groups` | Auto-include groups created from source categories (default `true`) |
 | `playlists[].include_group_prefixes` | Limit scope to specific group prefixes (e.g. `["UK\|"]`) |
 | `playlists[].min_channels` | Source guard: reject if fewer than N channels parsed (default 100) |
 | `playlists[].max_drop_percent` | Source guard: reject if count drops more than N% vs cache (default 20) |
