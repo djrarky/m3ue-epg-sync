@@ -91,6 +91,20 @@ services:
 | `playlists[].include_group_prefixes` | Limit scope to specific group prefixes (e.g. `["UK\|"]`) |
 | `playlists[].min_channels` | Source guard: reject if fewer than N channels parsed (default 100) |
 | `playlists[].max_drop_percent` | Source guard: reject if count drops more than N% vs cache (default 20) |
+| `playlists[].fuzzy_threshold` | Cutoff score for all fuzzy matching scorers (default 90) |
+| `playlists[].min_auto_score` | Minimum fuzzy score for auto_apply decision (default 90) |
+| `playlists[].min_auto_margin` | Minimum margin between best and runner-up for auto_apply (default 12) |
+| `playlists[].sort_floor_offset` | Subtracted from fuzzy_threshold for sort-score floor (default 10) |
+| `playlists[].min_alias_words` | Minimum word count for derived region aliases (default 2) |
+| `playlists[].min_alias_chars` | Minimum character count for derived region aliases (default 4) |
+| `playlists[].min_set_tokens` | Minimum tokens for token_set_ratio scorer (default 2) |
+| `playlists[].min_ratio_len_ratio` | Minimum length ratio for ratio scorer candidates (default 0.7) |
+| `playlists[].min_ratio_score` | Ratio score that bypasses sort-floor check (default 90) |
+| `playlists[].min_partial_len_ratio` | Minimum length ratio for partial_ratio candidates (default 0.65) |
+| `playlists[].min_partial_len` | Minimum string length for partial_ratio candidates (default 5) |
+| `playlists[].min_partial_ratio_score` | Minimum fuzz.ratio for partial_ratio guard (default 80) |
+| `playlists[].max_short_token_len` | Tokens this short must match exactly in validation (default 2) |
+| `playlists[].min_token_similarity` | Minimum similarity for conflicting-token validation (default 60) |
 
 `uuid: "all"` provides shared defaults. Real playlist entries inherit from it and
 can override any key. If `"all"` is the only entry, playlist UUIDs are discovered

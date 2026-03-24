@@ -19,21 +19,6 @@ except ImportError:
     sys.exit("Missing dependency: pip install pyyaml")
 
 from countries import get_country
-
-
-def _parse_bool(value: object, key: str) -> bool:
-    """Parse a config value as bool. Rejects quoted strings like "false"."""
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        low = value.strip().lower()
-        if low in ("true", "yes", "1"):
-            return True
-        if low in ("false", "no", "0", ""):
-            return False
-    if isinstance(value, (int, float)):
-        return bool(value)
-    sys.exit(f"Config error: {key} must be true or false, got {value!r}")
 from guide import fetch_guide
 from iptv import IPTVClient, apply_scope, apply_writes
 from matcher import MatchResult, Matcher, SourceEntry
@@ -61,6 +46,17 @@ _PLAYLIST_DEFAULTS = {
     "fuzzy_threshold": 90,
     "min_auto_score": 90,
     "min_auto_margin": 12,
+    "sort_floor_offset": 10,
+    "min_alias_words": 2,
+    "min_alias_chars": 4,
+    "min_set_tokens": 2,
+    "min_ratio_len_ratio": 0.7,
+    "min_ratio_score": 90,
+    "min_partial_len_ratio": 0.65,
+    "min_partial_len": 5,
+    "min_partial_ratio_score": 80,
+    "max_short_token_len": 2,
+    "min_token_similarity": 60,
     "scraping_timeout_seconds": 60,
     "source_cache_days": 2,
     "source_cache_dir": ".cache/scraper",
@@ -70,6 +66,21 @@ _PLAYLIST_DEFAULTS = {
 
 # Keys only required for web sources (have file extension = file source)
 _WEB_ONLY_KEYS = {"scraping_api", "scraping_api_key"}
+
+
+def _parse_bool(value: object, key: str) -> bool:
+    """Parse a config value as bool. Rejects quoted strings like "false"."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        low = value.strip().lower()
+        if low in ("true", "yes", "1"):
+            return True
+        if low in ("false", "no", "0", ""):
+            return False
+    if isinstance(value, (int, float)):
+        return bool(value)
+    sys.exit(f"Config error: {key} must be true or false, got {value!r}")
 
 
 def _load_config(path: Path) -> dict:

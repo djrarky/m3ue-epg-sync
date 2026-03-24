@@ -66,9 +66,22 @@ playlists:
     max_drop_percent: 20           # reject if count drops more than this % vs previous cache
 
     # Matching thresholds
-    min_auto_score: 90
-    min_auto_margin: 12
-    fuzzy_threshold: 90
+    min_auto_score: 90             # minimum fuzzy score for auto_apply decision
+    min_auto_margin: 12            # minimum margin between best and runner-up for auto_apply
+    fuzzy_threshold: 90            # cutoff score for all fuzzy matching scorers
+
+    # Advanced matching tuning - most users won't need to change these
+    sort_floor_offset: 10          # subtracted from fuzzy_threshold for sort-score floor
+    min_alias_words: 2             # minimum word count for derived region aliases
+    min_alias_chars: 4             # minimum character count for derived region aliases
+    min_set_tokens: 2              # minimum tokens for token_set_ratio scorer to engage
+    min_ratio_len_ratio: 0.7       # minimum length ratio for ratio scorer candidates
+    min_ratio_score: 90            # ratio score that bypasses sort-floor check
+    min_partial_len_ratio: 0.65    # minimum length ratio for partial_ratio scorer candidates
+    min_partial_len: 5             # minimum string length for partial_ratio scorer candidates
+    min_partial_ratio_score: 80    # minimum fuzz.ratio for partial_ratio guard
+    max_short_token_len: 2         # tokens this short must match exactly in validation
+    min_token_similarity: 60       # minimum similarity for conflicting-token validation
 
   # Real playlists - inherit from "all", override as needed.
   - uuid: "SET_ME"

@@ -67,9 +67,20 @@ class Matcher:
             self._fuzzy_threshold = int(playlist_config["fuzzy_threshold"])
             self._min_auto_score = int(playlist_config["min_auto_score"])
             self._min_auto_margin = int(playlist_config["min_auto_margin"])
+            self._sort_floor_offset = int(playlist_config["sort_floor_offset"])
+            self._min_alias_words = int(playlist_config["min_alias_words"])
+            self._min_alias_chars = int(playlist_config["min_alias_chars"])
+            self._min_set_tokens = int(playlist_config["min_set_tokens"])
+            self._min_ratio_len_ratio = float(playlist_config["min_ratio_len_ratio"])
+            self._min_ratio_score = int(playlist_config["min_ratio_score"])
+            self._min_partial_len_ratio = float(playlist_config["min_partial_len_ratio"])
+            self._min_partial_len = int(playlist_config["min_partial_len"])
+            self._min_partial_ratio_score = int(playlist_config["min_partial_ratio_score"])
+            self._max_short_token_len = int(playlist_config["max_short_token_len"])
+            self._min_token_similarity = int(playlist_config["min_token_similarity"])
         except (ValueError, TypeError) as exc:
-            raise ValueError(f"Matcher threshold config must be integers: {exc}") from exc
-        self._sort_floor = max(self._fuzzy_threshold - 10, 0)
+            raise ValueError(f"Matcher threshold config must be numeric: {exc}") from exc
+        self._sort_floor = max(self._fuzzy_threshold - self._sort_floor_offset, 0)
 
         # ── Derive aliases + build indexes ────────────────────────────────
         derived_aliases = self._derive_region_aliases(source_entries, country_rules)
@@ -126,7 +137,7 @@ class Matcher:
                     bare = entry.name[:match.start()].strip()
                     bare_words = bare.split()
                     if (bare and bare != entry.name
-                            and (len(bare_words) >= 2 or len(bare) >= 4)
+                            and (len(bare_words) >= self._min_alias_words or len(bare) >= self._min_alias_chars)
                             and bare not in entry.aliases):
                         derived.setdefault(entry.number, []).append(bare)
                     break
@@ -233,7 +244,7 @@ class Matcher:
             )
             for key, score, idx in (set_hits or []):
                 cand_tokens = len(self._fuzzy_keys[idx].split())
-                if cand_tokens >= 2:
+                if cand_tokens >= self._min_set_tokens:
                     if query_tokens <= cand_tokens or sort_score(idx) >= self._sort_floor:
                         if idx not in hit_map or score > hit_map[idx][1]:
                             hit_map[idx] = (key, score)
@@ -247,7 +258,7 @@ class Matcher:
         for key, score, idx in (ratio_hits or []):
             cand_len = len(self._fuzzy_keys[idx])
             len_ratio = min(query_len, cand_len) / max(query_len, cand_len) if max(query_len, cand_len) > 0 else 0
-            if len_ratio >= 0.7 and (score >= 90 or sort_score(idx) >= self._sort_floor):
+            if len_ratio >= self._min_ratio_len_ratio and (score >= self._min_ratio_score or sort_score(idx) >= self._sort_floor):
                 if idx not in hit_map or score > hit_map[idx][1]:
                     hit_map[idx] = (key, score)
 
@@ -261,7 +272,7 @@ class Matcher:
             cand_len = len(self._fuzzy_keys[idx])
             min_len = min(query_len, cand_len)
             len_ratio = min_len / max(query_len, cand_len) if max(query_len, cand_len) > 0 else 0
-            if len_ratio >= 0.65 and min_len >= 5 and fuzz.ratio(norm_title, self._fuzzy_keys[idx]) >= 80:
+            if len_ratio >= self._min_partial_len_ratio and min_len >= self._min_partial_len and fuzz.ratio(norm_title, self._fuzzy_keys[idx]) >= self._min_partial_ratio_score:
                 if sort_score(idx) >= self._sort_floor:
                     if idx not in hit_map or score > hit_map[idx][1]:
                         hit_map[idx] = (key, score)
@@ -293,10 +304,10 @@ class Matcher:
             has_related = False
             for qt in q_only:
                 for bt in b_only:
-                    if min(len(qt), len(bt)) <= 2:
+                    if min(len(qt), len(bt)) <= self._max_short_token_len:
                         if qt == bt:
                             has_related = True
-                    elif fuzz.ratio(qt, bt) >= 60:
+                    elif fuzz.ratio(qt, bt) >= self._min_token_similarity:
                         has_related = True
             if not has_related:
                 return "needs_review"

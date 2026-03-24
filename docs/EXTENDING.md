@@ -227,7 +227,7 @@ Underscore-prefixed files are ignored.
 
 - The source of truth for writes is the m3u-editor API, not the playlist M3U file.
 - The guide is fetched fresh each run.
-- Matching is intentionally centralized in `matcher.py`; source modules should focus on parsing.
+- Matching is intentionally centralized in `matcher.py`; source modules should focus on parsing. All matching thresholds and scorer guards are configurable per-playlist — see `config.example.yaml` for the full list under "Advanced matching tuning".
 - Shared HTTP retry behavior lives in `http_utils.py`. Scraper-level retries and stale-cache fallback are in `scrapers/__init__.py`.
 - Shared Sky parsing helpers live in `sources/sky/__init__.py`.
 
